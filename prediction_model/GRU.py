@@ -13,7 +13,6 @@ from  copy import deepcopy
 plt.rcParams['font.family'] = 'Microsoft YaHei'
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(torch.cuda.is_available())
-# device="cpu"
 scaler = MinMaxScaler() 
 class handler_data(Dataset):
     def __init__(self,data) -> None:
@@ -32,17 +31,6 @@ class handler_data(Dataset):
         all_gouzao_list = data['all_gouzao_list']
         all_yingdu_list = data['all_yingdu_list']
         all_target_list = data['all_target_list']
-        # all_fenchen_list_  = []
-        # all_fengsu_list_ = []
-        # all_target_list_= []
-        # print(all_fenchen_list[0])
-        # for item in range(len(all_fenchen_list)):
-        #     all_fenchen_list_.append(all_fenchen_list[item])
-        #     all_fengsu_list_.append(all_fengsu_list[item])
-        #     all_target_list_.append(all_target_list[item])
-        # # self.all_fenchen_list =  scaler.fit_transform(all_fenchen_list_)
-        # self.all_fengsu_list = scaler.fit_transform(all_fengsu_list_)
-        # self.all_target_list =  scaler.fit_transform(all_target_list_)
         self.all_fenchen_list =  all_fenchen_list
         self.all_fengsu_list = all_fengsu_list
         self.all_wendu_list = all_wendu_list
@@ -115,11 +103,7 @@ class transformers(nn.Module):
         # return torch.exp(tgt)
         return tgt
 criterion = nn.L1Loss(reduction='sum').to(device)
-# _model = transformers(3,1).to(device)
 _model = torch.load('./model/model_gru.pt')#18
-# 9675.930725097656,8732.237854003906,9075.17398071289,9186.740936279297,8704.185089111328,2660.466354370117,1915.9348068237305,1915.9348068237305,1528.6329193115234, 3314.258773803711
-# ,1034.1473274230957,1539.7082443237305,986.1357460021973,2441.1692504882812,1608.1407470703125,1137.1153945922852, 1212.6370735168457,854.7054290771484,1418.8653259277344,1385.4924621582031
-# ,1883.807632446289,925.9901237487793,728.9442596435547,864.4033737182617
 optimizer = torch.optim.Adam(_model.parameters(), lr=1e-4)
 def train(trans_data_loader):
     loss_data=[]
@@ -144,16 +128,11 @@ def train(trans_data_loader):
             print('all_gouzao_list.shape',all_gouzao_list.shape)
             gra_data  = torch.stack((all_fenchen_list,all_fengsu_list,all_wendu_list,all_hengduan_list,all_juejinjc_list,all_huifen_list,all_huifafen_list,all_shuifen_list,all_qingjiao_list,all_gouzao_list,all_yingdu_list),dim=1)# [16, 9, 16]
             print('gra_data.shape',gra_data.shape)
-            # print(grap_dim)
-            # print('all_hengduan_list.shape',all_hengduan_list.shape) torch.Size([16, 16, 1]
             all_target_list = date_item['all_target_list'].transpose(1,2).to(device)
             target = date_item['target']
             src_mask = date_item['src_mask'].to(device)
             print(src_mask.shape)
             print(all_target_list[0])
-            # tras_martix = tras_martix.reshape(4,5)
-            # print(tras_martix)
-            # print(src_mask.shape)
             outputs = _model(gra_data).to(device)
             print(outputs[0])
             print('outputs.shape',outputs.shape)
@@ -166,7 +145,6 @@ def train(trans_data_loader):
             items+=1
             total_loss+=output.item()
             print('Epoch {}, Step {} Train Loss {} '.format(Echop, items, output.item()) )
-        # torch.save(_model,'.\model\model_'+str(80+Echop)+".pt")
         loss_data.append(total_loss)
         print('Epoch {},  Totle Loss {}'.format(Echop, total_loss) )
         
@@ -177,32 +155,7 @@ def train(trans_data_loader):
     df['epoch']=np.arange(0,Echop+1)
     df.to_excel("gru_loss_guiyi.xlsx", index=False)
     plt.show()
-def vaildation():
-    return
-# 4136.919990539551    4097.382328033447   4037.812355041504  3917.7808723449707 3695.9693603515625  3572.4541578292847  3548.8950634002686  3520.985252380371 3509.5440545082092
-# def plot_time_series_class(data, class_name, ax, n_steps=5): 
-#     """
-#     param data:数据
-#     param class_name: 不同心跳类名
-#     param ax:画布
-#     """
-#     time_series_df = pd.DataFrame(data)
-#     # 平滑时间窗口
-#     smooth_path = time_series_df.rolling(n_steps).mean()
-#     # 路径偏差
-#     path_deviation = 1.5*time_series_df.rolling(n_steps).std()
-#     print(smooth_path)
-#     # 以正负偏差上下定义界限
-#     under_line = (smooth_path - path_deviation)[0]
-#     over_line = (smooth_path + path_deviation)[0]
-#     # 绘制平滑曲线
-#     ax.plot(smooth_path, linewidth=2)
-#     ax.fill_between(
-#       path_deviation.index,
-#       under_line,
-#       over_line,
-#       alpha=.125)
-#     ax.set_title(class_name)
+
 def main():
     # data = pd.read_excel("./data/fenchen/31060/22-10_fengsu.xlsx",usecols=[3,5,7]).dropna(how='any')[:5192]
     # data = pd.read_excel("./data/fenchen/23-03_fengsu.xlsx",usecols=[3,5,7]).dropna(how='any')[:400]
@@ -253,57 +206,7 @@ def main():
     org_yingdu_data = deepcopy(yingdu_data)
     
     np.random.seed(12345)
-    # for i in range(10):
-    #     # print("----------")
-    #     # print(len(fengsu_data))
-    #     # print(len(fenchen_data))
-    #     # print(len(wendu_data))
-    #     # print(len(hengduan_data))
-    #     # print(len(juejinjc_data))
-    #     # print(len(huifen_data))
-    #     # print(len(huifafen_data))
-    #     # print(len(shuifen_data))
-    #     # print(len(qingjiao_data))
-    #     # print(len(gouzao_data))
-    #     # print(len(yingdu_data))
-    #     # print(len(state_data))
-    #     # print("----------")
-    #     white_noise = 0.2*np.random.randn(len(org_data))+0.4
-    #     fenchen_data.extend(org_data+white_noise)
-    #     fengsu_data.extend(org_fengsu_data)
-    #     state_data.extend(org_state_data)
-    #     wendu_data.extend(org_wendu_data)
-        
-    #     hengduan_data.extend(org_hengduan_data)
-    #     juejinjc_data.extend(org_juejinjc_data)
-    #     huifen_data.extend(org_huifen_data)
-    #     huifafen_data.extend(org_huifafen_data)
-    #     shuifen_data.extend(org_shuifen_data)
-    #     qingjiao_data.extend(org_qingjiao_data)
-    #     gouzao_data.extend(org_gouzao_data)
-    #     yingdu_data.extend(org_yingdu_data)
-        
-        
-    #     fenchen_data.extend(fenchen_data_org[i*len(org_data):(i+1)*len(org_data)])
-    #     fengsu_data.extend(fengsu_data_org[i*len(org_fengsu_data):(i+1)*len(org_fengsu_data)])
-    #     state_data.extend(state_data_org[i*len(org_state_data):(i+1)*len(org_state_data)])
-    #     wendu_data.extend(wendu_data_org[i*len(org_wendu_data):(i+1)*len(org_wendu_data)])
-        
-    #     hengduan_data.extend(hengduan_data_org[i*len(org_hengduan_data):(i+1)*len(org_hengduan_data)])
-    #     juejinjc_data.extend(juejinjc_data_org[i*len(org_juejinjc_data):(i+1)*len(org_juejinjc_data)])
-    #     huifen_data.extend(huifen_data_org[i*len(org_huifen_data):(i+1)*len(org_huifen_data)])
-    #     huifafen_data.extend(huifafen_data_org[i*len(org_huifafen_data):(i+1)*len(org_huifafen_data)])
-    #     shuifen_data.extend(shuifen_data_org[i*len(org_shuifen_data):(i+1)*len(org_shuifen_data)])
-    #     qingjiao_data.extend(qingjiao_data_org[i*len(org_qingjiao_data):(i+1)*len(org_qingjiao_data)])
-    #     gouzao_data.extend(gouzao_data_org[i*len(org_gouzao_data):(i+1)*len(org_gouzao_data)])
-    #     yingdu_data.extend(yingdu_data_org[i*len(org_yingdu_data):(i+1)*len(org_yingdu_data)])
-        # print(org_data+white_noise)
-    # plt.plot(fenchen_data)
-    # plt.plot(fengsu_data)
-    # plt.xlabel('Time')
-    # plt.ylabel('Amplitude')
-    # plt.title('White Noise Signal')
-    # plt.show()
+
     print(len(fengsu_data))
     print(len(fenchen_data))
     print(len(wendu_data))
@@ -424,8 +327,6 @@ def main():
         all_gouzao_list.append(cur_gouzao)
         all_yingdu_list.append(cur_yingdu)
         all_target_list.append([data_ for data_ in data['fenchen'][i+seq_len:i+seq_len+5]])
-    # all_fengsu_list = scaler.fit_transform(pd.DataFrame(all_fengsu_list))
-    # all_target_list = scaler.fit_transform(pd.DataFrame(all_target_list))
     data_after = pd.DataFrame({'all_fenchen_list':all_fenchen_list,'all_fengsu_list':all_fengsu_list,
                                'all_target_list':all_target_list,'all_wendu_list':all_wendu_list,
                                'all_hengduan_list':all_hengduan_list,'all_juejinjc_list':all_juejinjc_list,
@@ -442,28 +343,6 @@ def main():
     classes = data.状态.unique()
     print('classed',classes)
     class_names=[0,1]
-# 定义画布
-    fig, axs = plt.subplots(
-        nrows=len(classes) // 3 + 1,
-        ncols=2,
-        sharey=True,
-        figsize=(12, 5))
-    # 循环绘制曲线
-    for i, cls in enumerate(classes):
-        print('cls',cls)
-       
-        ax = axs.flat[i]
-        datad = data[data.状态 == cls] \
-        .drop(labels='状态', axis=1) \
-        .to_numpy()
-        print( 'daad',datad)
-        # plot_time_series_class(datad, class_names[i], ax)
-
-    fig.delaxes(axs.flat[-1])
-    fig.tight_layout();
-
-    # ax = sns.countplot(x="target", data=plot_data)
-    plt.show()
     tras_data,test_vaildation = train_test_split(data_after,train_size=0.9,test_size=0.1,shuffle=False,random_state=1)
     test_vaildation.reset_index()
     test_data,vaildation_data = train_test_split(test_vaildation,train_size=0.1,shuffle=False,random_state=1)
@@ -524,30 +403,10 @@ def predict(model, dataset,scalerfenchen):
             print('outputs.shape',outputs.shape)
             print('all_target_list.shape',all_target_list.shape)
             all_data_pred.extend(outputs[:,0, :].T[0].cpu().numpy().tolist())
-            # print(outputs)
             output = criterion(all_target_list, outputs).to(device)
             output = output.reshape(output.shape[0],output.shape[1]).sum(dim=1)
             print('Train Loss {} '.format(torch.sum(output)) )
-            # predictions.append(outputs.cpu().numpy().flatten())
-            # print(output.item().shape)
             losses.extend(torch.tensor(output))
-            # for i in range(len(all_fenchen_list)):
-            #     test_0 = all_fenchen_list[i].reshape(all_fenchen_list[i].shape[0]*all_fenchen_list[i].shape[1])
-            #     target_0 = all_target_list[i].reshape( all_target_list[i].shape[0]*all_target_list[i].shape[1])
-            #     output_0 = outputs[i].reshape(outputs[i].shape[0],outputs[i].shape[1])
-            #     test_0 =  test_0.tolist()
-            #     pred = deepcopy(test_0)
-            #     test_0.extend(target_0)
-            #     pred.extend(output_0)
-            #     print(output_0)
-            #     plt.title('实际值与预测值')
-            #     plt.xlabel("时间步数")
-            #     plt.ylabel("值")
-            #     plt.plot(np.arange(0,len(test_0)),test_0,'rs:',label='实际值')
-            #     plt.plot(np.arange(0,len(pred)),pred,'m<:',label='预测值')
-            #     plt.legend()
-            #     plt.show()
-                
                 
             plt.title('实际值与预测值')
             plt.xlabel("时间步数")
