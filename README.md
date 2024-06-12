@@ -3,7 +3,7 @@ Here are all the models we used in the paper "Coal dust concentration prediction
 # MGformer
 ![Fig  6](https://github.com/chengfeiLiu/CDPAEW/assets/172521067/2956cc17-863c-4b1d-8915-3cf2afae4afe)
 
-# RESULTS
+# PARTIAL RESULTS
 1. Results of time series interpolation and outlier identification:
 
 ![Fig  10(b)](https://github.com/chengfeiLiu/CDPAEW/assets/172521067/d0d53d76-ba29-4369-afc4-3c6bf1173d9c)
