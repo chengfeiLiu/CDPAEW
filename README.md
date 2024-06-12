@@ -10,13 +10,13 @@ Here are all the models we used in the paper "Coal dust concentration prediction
 
 ![Fig  10(a)](https://github.com/chengfeiLiu/CDPAEW/assets/172521067/c58e174f-bc13-49d3-8e3b-407eaa6153f4)
 
-4. Error results and prediction results of each model:
+2. Error results and prediction results of each model:
 
 ![Fig  11](https://github.com/chengfeiLiu/CDPAEW/assets/172521067/40d1c42d-eda6-4385-a39b-b86a75e58c8f)
 
 ![Fig  12](https://github.com/chengfeiLiu/CDPAEW/assets/172521067/aa84db99-d859-493d-9476-45507b6a0952)
 
-6. Early-warning results
+3. Early-warning results
 
 ![Fig  14](https://github.com/chengfeiLiu/CDPAEW/assets/172521067/623f7ab8-6f3f-4faa-a9b5-808f0ea25ebd)
 
