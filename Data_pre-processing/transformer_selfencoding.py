@@ -10,8 +10,6 @@ from torch.utils.data import DataLoader,Dataset
 from sklearn.model_selection import train_test_split
 import math
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# print(torch.cuda.is_available())
-# device="cpu"
 class handler_data(Dataset):
     def __init__(self,data) -> None:
         super().__init__()
@@ -32,7 +30,6 @@ class handler_data(Dataset):
 batch_size = 16
 d_model=512
 seq_len =40 
-# 位置编码
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, dropout=0.1, max_len=5000):
             super(PositionalEncoding, self).__init__()
@@ -40,14 +37,12 @@ class PositionalEncoding(nn.Module):
             pe = torch.zeros(max_len, d_model)
             position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
             div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
-            pe[:, 0::2] = torch.sin(position * div_term)## 这里需要注意的是pe[:, 0::2]这个用法，就是从0开始到最后面，补长为2，其实代表的就是偶数位置
-            pe[:, 1::2] = torch.cos(position * div_term)##这里需要注意的是pe[:, 1::2]这个用法，就是从1开始到最后面，补长为2，其实代表的就是奇数位置
-            ## 上面代码获取之后得到的pe:[max_len*d_model]
+            pe[:, 0::2] = torch.sin(position * div_term)
+            pe[:, 1::2] = torch.cos(position * div_term)
 
-            ## 下面这个代码之后，我们得到的pe形状是：[max_len*1*d_model]
             pe = pe.unsqueeze(0).transpose(0, 1)
 
-            self.register_buffer('pe', pe)  ## 定一个缓冲区，其实简单理解为这个参数不更新就可以
+            self.register_buffer('pe', pe)  
 
     def forward(self, x):
             """
@@ -72,14 +67,10 @@ class transformers(nn.Module):
         out = self.encoder(src = tras_martix,src_key_padding_mask=src_mask_)
         dec_out = self.decoder(tras_martix,out)
         tgt = self.linear(dec_out)
-        # print(tgt)
         return tgt
 criterion = nn.L1Loss(reduction='sum').to(device)
 # _model = transformers(3,1).to(device)
 _model = torch.load('./lrm_model/model_94.pt')
-# 9675.930725097656,8732.237854003906,9075.17398071289,9186.740936279297,8704.185089111328,2660.466354370117,1915.9348068237305,1915.9348068237305,1528.6329193115234, 3314.258773803711
-# ,1034.1473274230957,1539.7082443237305,986.1357460021973,2441.1692504882812,1608.1407470703125,1137.1153945922852, 1212.6370735168457,854.7054290771484,1418.8653259277344,1385.4924621582031
-# ,1883.807632446289,925.9901237487793,728.9442596435547,864.4033737182617
 optimizer = torch.optim.Adam(_model.parameters(), lr=1e-4)
 def train(trans_data_loader):
     loss_data=[]
@@ -90,11 +81,7 @@ def train(trans_data_loader):
         items = 0
         for date_item in trans_data_loader:
             tras_martix = date_item['tras_martix'].transpose(1,2).to(device)
-            src_mask = date_item['src_mask'].to(device)
-            # tras_martix = tras_martix.reshape(4,5)
-            # src_mask = src_mask.reshape(4,1,d_model)
-            # print(tras_martix)
-            # print(src_mask.shape)
+            src_mask = date_item['src_mask'].to(device))
             outputs = _model(tras_martix=tras_martix,src_mask_= src_mask).to(device)
             output = criterion(tras_martix, outputs).to(device)
             optimizer.zero_grad()
@@ -113,32 +100,6 @@ def train(trans_data_loader):
     df.to_excel("loss_list.xlsx", index=False)
     print(loss_data)
     plt.show()
-def vaildation():
-    return
-
-def plot_time_series_class(data, class_name, ax, n_steps=5):
-    """
-    param data:数据
-    param class_name: 不同心跳类名
-    param ax:画布
-    """
-    time_series_df = pd.DataFrame(data)
-    # 平滑时间窗口
-    smooth_path = time_series_df.rolling(n_steps).mean()
-    # 路径偏差
-    path_deviation = 1.5*time_series_df.rolling(n_steps).std()
-    print(smooth_path)
-    # 以正负偏差上下定义界限
-    under_line = (smooth_path - path_deviation)[0]
-    over_line = (smooth_path + path_deviation)[0]
-    # 绘制平滑曲线
-    ax.plot(smooth_path, linewidth=2)
-    ax.fill_between(
-      path_deviation.index,
-      under_line,
-      over_line,
-      alpha=.125)
-    ax.set_title(class_name)
 min_max_scaler = preprocessing.MinMaxScaler(copy=True,feature_range=(0,1))
 def main():
     data = pd.read_excel("23-03handler.xlsx",usecols=[1,2]).dropna(how='any')
@@ -172,28 +133,6 @@ def main():
     classes = data.state.unique()
     print('classed',classes)
     class_names=[0,1]
-# 定义画布
-    fig, axs = plt.subplots(
-        nrows=len(classes) // 3 + 1,
-        ncols=2,
-        sharey=True,
-        figsize=(12, 5))
-    # 循环绘制曲线
-    for i, cls in enumerate(classes):
-        print('cls',cls)
-       
-        ax = axs.flat[i]
-        datad = data[data.state == cls] \
-        .drop(labels='state', axis=1) \
-        .to_numpy()
-        print( 'daad',datad)
-        plot_time_series_class(datad, class_names[i], ax)
-
-    fig.delaxes(axs.flat[-1])
-    fig.tight_layout();
-
-    # ax = sns.countplot(x="target", data=plot_data)
-    plt.show()
     tras_data_noalarm,test_vaildation_noalarm = train_test_split(noalarm_list,train_size=0.8,test_size=0.2,shuffle=False,random_state=1)
     test_data_noalarm,vaildation_data_noalarm = train_test_split(test_vaildation_noalarm,train_size=0.5,shuffle=False,random_state=1)
     handler_tras_data_noalarm = handler_data(data=tras_data_noalarm)
