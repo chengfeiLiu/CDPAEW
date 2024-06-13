@@ -16,17 +16,14 @@ def stock(stock_code):
 def get_indicators(stock_code):
     data = stock(stock_code)
     
-    #获取macd
     data["macd"], data["macd_signal"], data["macd_hist"] = talib.MACD(data['Close'],fastperiod=8, slowperiod=24, signalperiod=7)
     data_result_write = pd.ExcelWriter("./macd_result_huicai.xlsx")
     data.to_excel(data_result_write)
     data_result_write.close()
 
-    #获取10日均线和30日均线
     data["ma10"] = talib.MA(data["Close"], timeperiod=10)
     data["ma30"] = talib.MA(data["Close"], timeperiod=30)
  
-    #获取rsi
     data["rsi"] = talib.RSI(data["Close"])
     return data
 
