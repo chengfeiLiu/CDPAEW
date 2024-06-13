@@ -217,8 +217,6 @@ def train(trans_data_loader):
     plt.plot(np.arange(0,Echop+1),loss_data)
     print(loss_data)
     plt.show()
-def vaildation():
-    return
 
 def main():
     data = pd.read_excel("./data/all/31060/22-10_all_tot.xlsx",usecols=[0,1,2,3,4,5,6,7]).dropna(how='any')
