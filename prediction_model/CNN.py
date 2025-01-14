@@ -91,12 +91,8 @@ class transformers(nn.Module):#442
         self.cnn =  nn.Sequential(nn.Conv1d(in_channels=11,out_channels=5,kernel_size=5,padding=0),nn.ReLU(),nn.MaxPool1d(kernel_size=5))
         self.linear2 = nn.Linear(5,1)
     def forward(self,data):
-        print('data.shape',data.shape)
         cnndata=self.cnn(data)
-        print('cnndata.shape',cnndata.shape)
-        print('cnndata.shape',cnndata.shape)
         tgt = self.linear2(cnndata)
-        print('tgt',tgt.shape)
         return torch.exp(tgt)
 criterion = nn.L1Loss(reduction='sum').to(device)
 _model = torch.load('./model/model_cnn.pt')#18
@@ -378,8 +374,6 @@ def predict(model, dataset,scalerfenchen):
             print('all_gouzao_list.shape',all_gouzao_list.shape)
             gra_data  = torch.stack((all_fenchen_list,all_fengsu_list,all_wendu_list,all_hengduan_list,all_juejinjc_list,all_huifen_list,all_huifafen_list,all_shuifen_list,all_qingjiao_list,all_gouzao_list,all_yingdu_list),dim=1)# [16, 9, 16]
             print('gra_data.shape',gra_data.shape)
-            # print(grap_dim)
-            # print('all_hengduan_list.shape',all_hengduan_list.shape) torch.Size([16, 16, 1]
             all_target_list = date_item['all_target_list'].transpose(1,2).to(device)
             target = date_item['target']
             src_mask = date_item['src_mask'].to(device)
@@ -392,7 +386,6 @@ def predict(model, dataset,scalerfenchen):
             print('all_target_list.shape',all_target_list.shape)
             output = criterion(all_target_list, outputs).to(device)
             all_data_pred.extend(outputs[:,0, :].T[0].cpu().numpy().tolist())
-            # print(outputs)
             output = criterion(all_target_list, outputs).to(device)
             output = output.reshape(output.shape[0],output.shape[1]).sum(dim=1)
             print('Train Loss {} '.format(torch.sum(output)) )
@@ -412,9 +405,6 @@ def predict(model, dataset,scalerfenchen):
         data_result_write = pd.ExcelWriter("./cnn_predict_result.xlsx")
         result.to_excel(data_result_write)
         data_result_write.close()
-            # print(losses)
-            # total_loss+=output.item()
-        # print("loss",total_loss)
     return predictions, losses
 if __name__=='__main__':
     trans_data_loader,vaildation_data_loader,test_data_loader,scalerfenchen=main()
