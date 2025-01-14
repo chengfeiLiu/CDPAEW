@@ -69,8 +69,8 @@ class transformers(nn.Module):
         tgt = self.linear(dec_out)
         return tgt
 criterion = nn.L1Loss(reduction='sum').to(device)
-# _model = transformers(3,1).to(device)
-_model = torch.load('./lrm_model/model_94.pt')
+_model = transformers(3,1).to(device)
+#_model = torch.load('./lrm_model/model_94.pt')
 optimizer = torch.optim.Adam(_model.parameters(), lr=1e-4)
 def train(trans_data_loader):
     loss_data=[]
@@ -128,7 +128,6 @@ def main():
     print(len(target))
     print(noalarm_list)
     print(len(alarm_list))
-    # plot_data = pd.Series([count_1,(len(target)-count_1)],index=['alarm', 'noalarm'])
     plot_data = pd.Series({"target":target})
     classes = data.state.unique()
     print('classed',classes)
@@ -167,30 +166,12 @@ def predict(model, dataset):
             sun_loss = torch.sum(output)
             total_loss += sun_loss
             print('Train Loss {} '.format(torch.sum(output)) )
-            # predictions.append(outputs.cpu().numpy().flatten())
-            # print(output.item().shape)
             losses.extend(torch.tensor(output))
-            # print(losses)
-        # print("loss",total_loss)
     return predictions, losses,total_loss
 if __name__=='__main__':
     trans_data_loader_noalarm,vaildation_data_loader_noalarm,test_data_loader_noalarm,trans_data_loader_alarm,vaildation_data_loader_alarm,test_data_loader_alarm=main()
     print(len(vaildation_data_loader_noalarm))
-    # train(trans_data_loader_noalarm)
-    # all_loss = []
-    # for i in range(100):
-    #     _model = torch.load('./lrm_model/model_'+str(i)+'.pt')  # 18
-    #     _, losses,total_loss = predict(_model, vaildation_data_loader_noalarm)
-    #     all_loss.append(torch.Tensor.cpu(total_loss))
-    # print(all_loss)
-    # plt.plot(np.arange(0, 100), all_loss)
-    # df = pd.DataFrame(all_loss, columns=['all_loss'])
-    # df['epoch'] = np.arange(0, 100)
-    # df.to_excel("val_loss_list.xlsx", index=False)
-    # plt.show()
-    # _, losses = predict(_model, trans_data_loader_alarm)
-    # _, losses = predict(_model, vaildation_data_loader_noalarm)
-    # _, losses = predict(_model, vaildation_data_loader_alarm)
+    train(trans_data_loader_noalarm)
     _, losses ,total_loss= predict(_model, test_data_loader_noalarm)
     _alarm, losses_alarm,total_loss = predict(_model, test_data_loader_alarm)
     losses = [it.item() for it  in losses]
