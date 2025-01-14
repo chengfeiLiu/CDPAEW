@@ -92,12 +92,7 @@ class transformers(nn.Module):
         # self.linear3 = nn.Linear(256,128)
         self.linear4 = nn.Linear(11,1)
     def forward(self,data):
-        print('data.shape',data.shape)
         bpnn_data =self.linear4(self.linear2(self.linear1(data)).transpose(1,2))
-        print('bpnn_data.shape',bpnn_data.shape)
-        # tgt = bpnn_data.unsqueeze(1)
-        print('tgt',bpnn_data.shape)
-        # return torch.exp(tgt)
         return bpnn_data
 criterion = nn.L1Loss(reduction='sum').to(device)
 _model = torch.load('./model/model_bpnn.pt')#18
@@ -140,9 +135,6 @@ def train(trans_data_loader):
             src_mask = date_item['src_mask'].to(device)
             print(src_mask.shape)
             print(all_target_list[0])
-            # tras_martix = tras_martix.reshape(4,5)
-            # print(tras_martix)
-            # print(src_mask.shape)
             outputs = _model(gra_data).to(device)
             print(outputs[0])
             print('outputs.shape',outputs.shape)
