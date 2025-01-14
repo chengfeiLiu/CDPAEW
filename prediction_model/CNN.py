@@ -158,7 +158,6 @@ def train(trans_data_loader):
 def main():
     data = pd.read_excel("./data/all/31060_sin/22-10_all_tot.xlsx",usecols=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]).dropna(how='any')
     data_org = pd.read_excel("./data/all/31060_sin/22-10_all_org.xlsx",usecols=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]).dropna(how='any')
-    print(data.info)
     fenchen_data = data['fenchen'].to_list()
     fengsu_data = data['fengsu'].to_list()
     state_data = data['state'].to_list()
