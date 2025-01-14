@@ -94,13 +94,8 @@ class transformers(nn.Module):
         self.linear2 = nn.Linear(11,5)
     def forward(self,data):
         lstnet_data=self.LSTNet(data.transpose(1,2))
-        # rnndata = rnndata.transpose(0,1).reshape(rnndata.shape[1],rnndata.shape[0]*rnndata.shape[2])
-        print('rnndata.shape',lstnet_data.shape)
-        # dec_out = self.decoder(fenchen_matrix,out)
         tgt = self.linear2(lstnet_data)
         tgt = tgt.unsqueeze(2)
-        print('tgt',tgt.shape)
-        # return torch.exp(tgt)
         return tgt
 criterion = nn.L1Loss(reduction='sum').to(device)
 _model = torch.load('./model/model_lstnet.pt')#18
@@ -128,16 +123,11 @@ def train(trans_data_loader):
             print('all_gouzao_list.shape',all_gouzao_list.shape)
             gra_data  = torch.stack((all_fenchen_list,all_fengsu_list,all_wendu_list,all_hengduan_list,all_juejinjc_list,all_huifen_list,all_huifafen_list,all_shuifen_list,all_qingjiao_list,all_gouzao_list,all_yingdu_list),dim=1)# [16, 9, 16]
             print('gra_data.shape',gra_data.shape)
-            # print(grap_dim)
-            # print('all_hengduan_list.shape',all_hengduan_list.shape) torch.Size([16, 16, 1]
             all_target_list = date_item['all_target_list'].transpose(1,2).to(device)
             target = date_item['target']
             src_mask = date_item['src_mask'].to(device)
             print(src_mask.shape)
             print(all_target_list[0])
-            # tras_martix = tras_martix.reshape(4,5)
-            # print(tras_martix)
-            # print(src_mask.shape)
             outputs = _model(gra_data).to(device)
             print(outputs[0])
             print('outputs.shape',outputs.shape)
@@ -162,17 +152,14 @@ def train(trans_data_loader):
     df.to_excel("lstnet_loss_guiyi.xlsx", index=False)
     plt.show()
 def main():
-    # data = pd.read_excel("./data/fenchen/31060/22-10_fengsu.xlsx",usecols=[3,5,7]).dropna(how='any')[:5192]
-    # data = pd.read_excel("./data/fenchen/23-03_fengsu.xlsx",usecols=[3,5,7]).dropna(how='any')[:400]
-    # data_org = pd.read_excel("./data/fenchen/23-03_fengsu_org.xlsx",usecols=[3,5,7]).dropna(how='any')[400:]
-    data = pd.read_excel("./data/all/31060_sin/22-10_all_tot.xlsx",usecols=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]).dropna(how='any')[:2430]
-    data_org = pd.read_excel("./data/all/31060_sin/22-10_all_org.xlsx",usecols=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]).dropna(how='any')[400:]
+    data = pd.read_excel("./data/all/31060_sin/22-10_all_tot.xlsx",usecols=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]).dropna(how='any')
+    data_org = pd.read_excel("./data/all/31060_sin/22-10_all_org.xlsx",usecols=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]).dropna(how='any')
     print(data.info)
     fenchen_data = data['fenchen'].to_list()
     fengsu_data = data['fengsu'].to_list()
-    state_data = data['状态'].to_list()
+    state_data = data['state'].to_list()
     wendu_data = data['wendu'].to_list()
-    # 单个指标
+
     hengduan_data = data['hengduan'].to_list()
     juejinjc_data = data['juejinjc'].to_list()
     huifen_data = data['huifen'].to_list()
@@ -185,9 +172,9 @@ def main():
     
     fenchen_data_org = data_org['fenchen'].to_list()
     fengsu_data_org = data_org['fengsu'].to_list()
-    state_data_org = data_org['状态'].to_list()
+    state_data_org = data_org['state'].to_list()
     wendu_data_org = data_org['wendu'].to_list()
-    # 单个指标
+
     hengduan_data_org = data_org['hengduan'].to_list()
     juejinjc_data_org = data_org['juejinjc'].to_list()
     huifen_data_org = data_org['huifen'].to_list()
@@ -234,40 +221,40 @@ def main():
     qingjiao_data_chai = [fengsu_data[i : i + 10] for i in range(0, len(qingjiao_data), 10)]
     gouzao_data_chai = [fengsu_data[i : i + 10] for i in range(0, len(gouzao_data), 10)]
     yingdu_data_chai = [fengsu_data[i : i + 10] for i in range(0, len(yingdu_data), 10)]
-    scaler = MinMaxScaler() #实例化
-    scalerfenchen = scaler.fit(fenchen_data_chai) #fit，在这里本质是生成min(x)和max(x)
+    scaler = MinMaxScaler() 
+    scalerfenchen = scaler.fit(fenchen_data_chai)
     fenchen_data = list(np.array(scalerfenchen.transform(fenchen_data_chai)).ravel())
     
-    scalerfengsu = scaler.fit(fengsu_data_chai) #fit，在这里本质是生成min(x)和max(x)
+    scalerfengsu = scaler.fit(fengsu_data_chai) 
     fengsu_data = list(np.array(scalerfengsu.transform(fengsu_data_chai)).ravel())
     
-    scalerwendu = scaler.fit(wendu_data_chai) #fit，在这里本质是生成min(x)和max(x)
+    scalerwendu = scaler.fit(wendu_data_chai) 
     wendu_data = list(np.array(scalerwendu.transform(wendu_data_chai)).ravel())
     
-    scalerhengduan = scaler.fit(hengduan_data_chai) #fit，在这里本质是生成min(x)和max(x)
+    scalerhengduan = scaler.fit(hengduan_data_chai) 
     hengduan_data = list(np.array(scalerhengduan.transform(hengduan_data_chai)).ravel())
     
-    scalerjuejinjc = scaler.fit(juejinjc_data_chai) #fit，在这里本质是生成min(x)和max(x)
+    scalerjuejinjc = scaler.fit(juejinjc_data_chai) 
     juejinjc_data = list(np.array(scalerjuejinjc.transform(juejinjc_data_chai)).ravel())
         
-    scalerhuifen = scaler.fit(huifen_data_chai) #fit，在这里本质是生成min(x)和max(x)
+    scalerhuifen = scaler.fit(huifen_data_chai) 
     huifen_data = list(np.array(scalerhuifen.transform(huifen_data_chai)).ravel())
             
-    scalerhuifafen = scaler.fit(huifafen_data_chai) #fit，在这里本质是生成min(x)和max(x)
+    scalerhuifafen = scaler.fit(huifafen_data_chai) 
     huifafen_data = list(np.array(scalerhuifafen.transform(huifafen_data_chai)).ravel())
                 
-    scalerssshuifen = scaler.fit(shuifen_data_chai) #fit，在这里本质是生成min(x)和max(x)
+    scalerssshuifen = scaler.fit(shuifen_data_chai)
     shuifen_data = list(np.array(scalerssshuifen.transform(shuifen_data_chai)).ravel())
                     
-    scalerqingjiao = scaler.fit(qingjiao_data_chai) #fit，在这里本质是生成min(x)和max(x)
+    scalerqingjiao = scaler.fit(qingjiao_data_chai)
     qingjiao_data = list(np.array(scalerqingjiao.transform(qingjiao_data_chai)).ravel())
             
-    scalergouzao = scaler.fit(gouzao_data_chai) #fit，在这里本质是生成min(x)和max(x)
+    scalergouzao = scaler.fit(gouzao_data_chai)
     gouzao_data = list(np.array(scalergouzao.transform(gouzao_data_chai)).ravel())
                 
-    scaleryingdu = scaler.fit(yingdu_data_chai) #fit，在这里本质是生成min(x)和max(x)
+    scaleryingdu = scaler.fit(yingdu_data_chai) 
     yingdu_data = list(np.array(scaleryingdu.transform(yingdu_data_chai)).ravel())
-    data = pd.DataFrame({'fengsu':fengsu_data,'fenchen':fenchen_data,'wendu':wendu_data,'状态':state_data,
+    data = pd.DataFrame({'fengsu':fengsu_data,'fenchen':fenchen_data,'wendu':wendu_data,'state':state_data,
                          'hengduan':hengduan_data,'juejinjc':juejinjc_data,'huifen':huifen_data,
                          'huifafen':huifafen_data,'shuifen':shuifen_data,'qingjiao':qingjiao_data,
                          'gouzao':gouzao_data,'yingdu':yingdu_data})
@@ -306,7 +293,7 @@ def main():
         cur_qingjiao = [data_ for data_ in data['qingjiao'][i:i+seq_len]]
         cur_gouzao = [data_ for data_ in data['gouzao'][i:i+seq_len]]
         cur_yingdu = [data_ for data_ in data['yingdu'][i:i+seq_len]]
-        for state_data in data['状态'][i:i+seq_len]:
+        for state_data in data['state'][i:i+seq_len]:
             if state_data==1:
                 if pre==1:
                     target.append(1)
@@ -342,9 +329,8 @@ def main():
     print(len(target))
     print(noalarm_list)
     print(len(alarm_list))
-    # plot_data = pd.Series([count_1,(len(target)-count_1)],index=['alarm', 'noalarm'])
     plot_data = pd.Series({"target":target})
-    classes = data.状态.unique()
+    classes = data.state.unique()
     print('classed',classes)
     class_names=[0,1]
     tras_data,test_vaildation = train_test_split(data_after,train_size=0.9,test_size=0.1,shuffle=False,random_state=1)
@@ -358,8 +344,6 @@ def main():
     trans_data_loader = DataLoader(handler_tras_data,batch_size=batch_size,shuffle=False)
     vaildation_data_loader = DataLoader(handler_vaildation_data,batch_size=batch_size,shuffle=False)
     test_data_loader = DataLoader(handler_test_data,batch_size=batch_size,shuffle=False)
-    
-    
     return trans_data_loader,vaildation_data_loader,test_data_loader,scalerfenchen
 def predict(model, dataset,scalerfenchen):
     predictions, losses = [], []
@@ -386,8 +370,6 @@ def predict(model, dataset,scalerfenchen):
             print('all_gouzao_list.shape',all_gouzao_list.shape)
             gra_data  = torch.stack((all_fenchen_list,all_fengsu_list,all_wendu_list,all_hengduan_list,all_juejinjc_list,all_huifen_list,all_huifafen_list,all_shuifen_list,all_qingjiao_list,all_gouzao_list,all_yingdu_list),dim=1)# [16, 9, 16]
             print('gra_data.shape',gra_data.shape)
-            # print(grap_dim)
-            # print('all_hengduan_list.shape',all_hengduan_list.shape) torch.Size([16, 16, 1]
             all_target_list = date_item['all_target_list'].transpose(1,2).to(device)
             target = date_item['target']
             src_mask = date_item['src_mask'].to(device)
@@ -400,49 +382,27 @@ def predict(model, dataset,scalerfenchen):
             print('all_target_list.shape',all_target_list.shape)
             output = criterion(all_target_list, outputs).to(device)
             all_data_pred.extend(outputs[:,0, :].T[0].cpu().numpy().tolist())
-            # print(outputs)
             output = criterion(all_target_list, outputs).to(device)
             output = output.reshape(output.shape[0],output.shape[1]).sum(dim=1)
             print('Train Loss {} '.format(torch.sum(output)) )
             losses.extend(torch.tensor(output))
           
                 
-            plt.title('实际值与预测值')
-            plt.xlabel("时间步数")
-            plt.ylabel("值")
+            plt.title('true and pred value')
+            plt.xlabel("time steps")
+            plt.ylabel("value")
             if len(all_data_true)%10==0:
-                plt.plot(np.arange(0,len(all_data_true)),list(np.array(scalerfenchen.inverse_transform([all_data_true[i : i + 10] for i in range(0, len(all_data_true), 10)])).ravel()),'rs:',label='实际值')
-            # plt.plot(np.arange(0,len(all_target_list[:,0,:].T[0].numpy().tolist())),all_target_list[:,0,:].T[0].numpy().tolist(),'rs:',label='实际值')
-                plt.plot(np.arange(0,len(all_data_pred)),list(np.array(scalerfenchen.inverse_transform([all_data_pred[i : i + 10] for i in range(0, len(all_data_pred), 10)])).ravel()),'m<:',label='预测值')
-            # plt.plot(np.arange(0,len(outputs[:,0, :].T[0].numpy().tolist())),outputs[:,0, :].T[0].numpy().tolist(),'m<:',label='预测值')
+                plt.plot(np.arange(0,len(all_data_true)),list(np.array(scalerfenchen.inverse_transform([all_data_true[i : i + 10] for i in range(0, len(all_data_true), 10)])).ravel()),'rs:',label='true value')
+            # plt.plot(np.arange(0,len(all_target_list[:,0,:].T[0].numpy().tolist())),all_target_list[:,0,:].T[0].numpy().tolist(),'rs:',label='true value')
+                plt.plot(np.arange(0,len(all_data_pred)),list(np.array(scalerfenchen.inverse_transform([all_data_pred[i : i + 10] for i in range(0, len(all_data_pred), 10)])).ravel()),'m<:',label='pred value')
+            # plt.plot(np.arange(0,len(outputs[:,0, :].T[0].numpy().tolist())),outputs[:,0, :].T[0].numpy().tolist(),'m<:',label='pred value')
                 plt.legend()
                 plt.show()
         result = pd.DataFrame({"true":all_data_true,"pred":all_data_pred})
         data_result_write = pd.ExcelWriter("./lstnet_predict_result.xlsx")
         result.to_excel(data_result_write)
         data_result_write.close()
-            # print(losses)
-            # total_loss+=output.item()
-        # print("loss",total_loss)
     return predictions, losses
 if __name__=='__main__':
     trans_data_loader,vaildation_data_loader,test_data_loader,scalerfenchen=main()
-    # print(len(trans_data_loader))
-    # train(trans_data_loader)
-    _, losses = predict(_model, trans_data_loader,scalerfenchen)
-    # _, losses = predict(_model, trans_data_loader_alarm)
-    # _, losses = predict(_model, vaildation_data_loader_noalarm)
-    # _, losses = predict(_model, trans_data_loader)
-    # _, losses = predict(_model, trans_data_loader)
-    # _alarm, losses_alarm = predict(_model, test_data_loader_alarm)
-    
-    # threshold = 5
-    # correct = sum(l <= threshold for l in losses)
-    # print(f'Correct noalarm predictions: {correct}/{len(losses)}')
-    # correct_alarm = sum(l >= threshold for l in losses_alarm)
-    # print(f'Correct alarm predictions: {correct_alarm}/{len(losses_alarm)}')
-    # sns.displot(torch.tensor(losses), bins=50, kde=True)
-    # plt.show()
-    # sns.displot(torch.tensor(losses_alarm), bins=50, kde=True)
-    # plt.show()
-    # plt.legend()
+    train(trans_data_loader)
