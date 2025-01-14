@@ -95,13 +95,8 @@ class transformers(nn.Module):
         _da,h_n=self.lstm(data.transpose(1,2))
         rnndata=h_n[0]
         rnndata = rnndata.transpose(0,1).reshape(rnndata.shape[1],rnndata.shape[0]*rnndata.shape[2])
-        print('rnndata.shape',rnndata.shape)
-        print('_da.shape',_da.shape)
-        # dec_out = self.decoder(fenchen_matrix,out)
         tgt = self.linear2(rnndata)
         tgt = tgt.unsqueeze(2)
-        print('tgt',tgt.shape)
-        # return torch.exp(tgt)
         return tgt
 criterion = nn.L1Loss(reduction='sum').to(device)
 
@@ -360,15 +355,6 @@ def main():
     trans_data_loader = DataLoader(handler_tras_data,batch_size=batch_size,shuffle=False)
     vaildation_data_loader = DataLoader(handler_vaildation_data,batch_size=batch_size,shuffle=False)
     test_data_loader = DataLoader(handler_test_data,batch_size=batch_size,shuffle=False)
-    
-    # tras_data_alarm,test_vaildation_alarm = train_test_split(alarm_list,train_size=0.8,test_size=0.2,shuffle=False,random_state=1)
-    # vaildation_data_alarm,test_data_alarm = train_test_split(test_vaildation_alarm,train_size=0.5,shuffle=False,random_state=1)
-    # handler_tras_data_alarm = handler_data(data=tras_data_alarm)
-    # handler_vaildation_data_alarm = handler_data(data=vaildation_data_alarm)
-    # handler_test_data_alarm = handler_data(data=test_data_alarm)
-    # trans_data_loader_alarm = DataLoader(handler_tras_data_alarm,batch_size=batch_size,shuffle=True)
-    # vaildation_data_loader_alarm = DataLoader(handler_vaildation_data_alarm,batch_size=batch_size,shuffle=True)
-    # test_data_loader_alarm = DataLoader(handler_test_data_alarm,batch_size=batch_size,shuffle=True)
     
     return trans_data_loader,vaildation_data_loader,test_data_loader,scalerfenchen
 def predict(model, dataset,scalerfenchen):
