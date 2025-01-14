@@ -92,11 +92,7 @@ class transformers(nn.Module):
         self.linear2 = nn.Linear(d_model,5)
     def forward(self,data):
         _da,rnndata=self.gru(data.transpose(1,2))
-        print('rnndata.shape',rnndata.shape)
         rnndata = rnndata.transpose(0,1).reshape(rnndata.shape[1],rnndata.shape[0]*rnndata.shape[2])
-        print('rnndata.shape',rnndata.shape)
-        print('_da.shape',_da.shape)
-        # dec_out = self.decoder(fenchen_matrix,out)
         tgt = self.linear2(rnndata)
         tgt = tgt.unsqueeze(2)
         print('tgt',tgt.shape)
@@ -332,7 +328,6 @@ def main():
     print(len(target))
     print(noalarm_list)
     print(len(alarm_list))
-    # plot_data = pd.Series([count_1,(len(target)-count_1)],index=['alarm', 'noalarm'])
     plot_data = pd.Series({"target":target})
     classes = data.state.unique()
     print('classed',classes)
@@ -408,9 +403,6 @@ def predict(model, dataset,scalerfenchen):
         data_result_write = pd.ExcelWriter("./gru_predict_result.xlsx")
         result.to_excel(data_result_write)
         data_result_write.close()
-            # print(losses)
-            # total_loss+=output.item()
-        # print("loss",total_loss)
     return predictions, losses
 if __name__=='__main__':
     trans_data_loader,vaildation_data_loader,test_data_loader,scalerfenchen=main()
