@@ -1,5 +1,5 @@
 # CDPAEW
-Here are all the models we used in the paper "Coal dust concentration prediction and early-warning in fully mechanized drivage and fully mechanized stope working faces based on MGformer". The repository contains all the test data, if you need all raw data, send it to lcfqssyx@163.com and we will get back to you with your data request.
+Here are  the models we used in the paper "MGformer-based dust concentration prediction and disaster risk early-warning in coal mines".
 # MGformer
 ![Fig  6](https://github.com/chengfeiLiu/CDPAEW/assets/172521067/2956cc17-863c-4b1d-8915-3cf2afae4afe)
 
