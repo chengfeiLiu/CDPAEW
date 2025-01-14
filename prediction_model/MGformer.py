@@ -67,12 +67,12 @@ seq_len =16
 nhead=4
 d_k=d_v=d_q=32
 n_layers=4*d_model
-d_ff = 1024  # FeedForward dimension
+d_ff = 1024 
 
 fastmode=False
 sparse=False
 seed=72
-epochs=10000
+epochs=800
 lr=0.005
 nfeat = 16
 weight_decay=5e-4
@@ -86,7 +86,6 @@ dropout=0.6
 alpha=0.2
 nclass=9                                                                                                         
 
-# 位置编码
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, dropout=0.1, max_len=5000):
             super(PositionalEncoding, self).__init__()
@@ -107,7 +106,6 @@ class PositionalEncoding(nn.Module):
             """
             x = x + self.pe[:x.size(0), :]
             return self.dropout(x)
-# 计算相似度
 class MultiHeadAttention(nn.Module):
     def __init__(self) -> None:
         super().__init__()
@@ -170,7 +168,7 @@ class PoswiseFeedForwardNet(nn.Module):
         self.layer_norm = nn.LayerNorm(d_model)
 
     def forward(self, inputs):
-        residual = inputs # inputs : [batch_size, len_q, d_model]
+        residual = inputs
         output = nn.ReLU()(self.conv1(inputs.transpose(1, 2)))
         output = self.conv2(output).transpose(1, 2)
         return self.layer_norm(output + residual)
@@ -179,7 +177,6 @@ class EncoderLayer(nn.Module):
         super(EncoderLayer, self).__init__()
         self.enc_self_attn = MultiHeadAttention()
         self.pos_ffn = PoswiseFeedForwardNet()
-
     def forward(self, ronghe_features,enc_inputs_1,enc_inputs_2, enc_inputs_3,enc_self_attn_mask):
         enc_outputs = self.enc_self_attn(ronghe_features,ronghe_features,ronghe_features,enc_inputs_1, enc_inputs_1, enc_inputs_1, enc_inputs_2,enc_inputs_2,enc_inputs_2,enc_inputs_3,enc_inputs_3,enc_inputs_3,enc_self_attn_mask) 
         enc_outputs = self.pos_ffn(enc_outputs) 
@@ -253,7 +250,6 @@ def train(trans_data_loader):
             all_shuifen_ = torch.cat((shuifen_index,all_shuifen_list),dim=-1)
             juejinjc_index = torch.tensor([[5]]*batch_size); 
             all_juejinjc_ = torch.cat((juejinjc_index,all_juejinjc_list),dim=-1)
-            # huicaijc_index#
             qingjiao_index = torch.tensor([[6]]*batch_size);
             all_qingjiao_ = torch.cat((qingjiao_index,all_qingjiao_list),dim=-1)
             gouzao_index = torch.tensor([[7]]*batch_size);   
@@ -265,7 +261,7 @@ def train(trans_data_loader):
             
             
             gra_data  = torch.stack((all_fenchen_,all_huifen_,all_huifafen_,all_shuifen_,all_juejinjc_,all_qingjiao_,all_gouzao_,all_yingdu_,all_hengduan_),dim=1)# [16, 9, 16]
-            adj, features, labels, idx_train, idx_val, idx_test = load_data(gra_data) # 生
+            adj, features, labels, idx_train, idx_val, idx_test = load_data(gra_data)
             adj = adj.repeat(16,1,1)
             all_target_list = date_item['all_target_list'].transpose(1,2).to(device)
             target = date_item['target']
@@ -291,14 +287,13 @@ def train(trans_data_loader):
     plt.show()
 
 def main():
-    data = pd.read_excel("./data/all/31060_sin/22-10_all_tot.xlsx",usecols=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]).dropna(how='any')[:400]
-    data_org = pd.read_excel("./data/all/31060_sin/22-10_all_org.xlsx",usecols=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]).dropna(how='any')[400:]
+    data = pd.read_excel("./data/all/31060_sin/22-10_all_tot.xlsx",usecols=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]).dropna(how='any')
+    data_org = pd.read_excel("./data/all/31060_sin/22-10_all_org.xlsx",usecols=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]).dropna(how='any')
     print(data.info)
     fenchen_data = data['fenchen'].to_list()
     fengsu_data = data['fengsu'].to_list()
-    state_data = data['状态'].to_list()
+    state_data = data['state'].to_list()
     wendu_data = data['wendu'].to_list()
-    # 单个指标
     hengduan_data = data['hengduan'].to_list()
     juejinjc_data = data['juejinjc'].to_list()
     huifen_data = data['huifen'].to_list()
@@ -311,9 +306,8 @@ def main():
     
     fenchen_data_org = data_org['fenchen'].to_list()
     fengsu_data_org = data_org['fengsu'].to_list()
-    state_data_org = data_org['状态'].to_list()
+    state_data_org = data_org['state'].to_list()
     wendu_data_org = data_org['wendu'].to_list()
-    # 单个指标
     hengduan_data_org = data_org['hengduan'].to_list()
     juejinjc_data_org = data_org['juejinjc'].to_list()
     huifen_data_org = data_org['huifen'].to_list()
@@ -381,10 +375,10 @@ def main():
     print(len(gouzao_data))
     print(len(yingdu_data))
     print(len(state_data))
-    data = pd.DataFrame({'fengsu':fengsu_data,'fenchen':fenchen_data,'wendu':wendu_data,'状态':state_data,
+    data = pd.DataFrame({'fengsu':fengsu_data,'fenchen':fenchen_data,'wendu':wendu_data,'state':state_data,
                          'hengduan':hengduan_data,'juejinjc':juejinjc_data,'huifen':huifen_data,
                          'huifafen':huifafen_data,'shuifen':shuifen_data,'qingjiao':qingjiao_data,
-                         'gouzao':gouzao_data,'yingdu':yingdu_data})[:400]
+                         'gouzao':gouzao_data,'yingdu':yingdu_data})
     data.reset_index(drop=True, inplace=True)
     alarm_list = []
     noalarm_list = []
@@ -420,7 +414,7 @@ def main():
         cur_qingjiao = [data_ for data_ in data['qingjiao'][i:i+seq_len]]
         cur_gouzao = [data_ for data_ in data['gouzao'][i:i+seq_len]]
         cur_yingdu = [data_ for data_ in data['yingdu'][i:i+seq_len]]
-        for state_data in data['状态'][i:i+seq_len]:
+        for state_data in data['state'][i:i+seq_len]:
             if state_data==1:
                 if pre==1:
                     target.append(1)
@@ -458,7 +452,7 @@ def main():
     print(noalarm_list)
     print(len(alarm_list))
     plot_data = pd.Series({"target":target})
-    classes = data.状态.unique()
+    classes = data.state.unique()
     print('classed',classes)
     class_names=[0,1]
 
@@ -473,8 +467,6 @@ def main():
     trans_data_loader = DataLoader(handler_tras_data,batch_size=batch_size,shuffle=False)
     vaildation_data_loader = DataLoader(handler_vaildation_data,batch_size=batch_size,shuffle=False)
     test_data_loader = DataLoader(handler_test_data,batch_size=batch_size,shuffle=False)
-
-    
     return trans_data_loader,vaildation_data_loader,test_data_loader
 def predict(model, dataset):
     predictions, losses = [], []
@@ -504,13 +496,11 @@ def predict(model, dataset):
             output = output.reshape(output.shape[0],output.shape[1]).sum(dim=1)
             print('Train Loss {} '.format(torch.sum(output)) )
             losses.extend(torch.tensor(output))
-           
-                
-            plt.title('实际值与预测值')
-            plt.xlabel("时间步数")
-            plt.ylabel("值")
-            plt.plot(np.arange(0,len(all_data_true)),all_data_true,'rs:',label='实际值')
-            plt.plot(np.arange(0,len(all_data_pred)),all_data_pred,'m<:',label='预测值')
+            plt.title('true and pred value')
+            plt.xlabel("time step ")
+            plt.ylabel("value")
+            plt.plot(np.arange(0,len(all_data_true)),all_data_true,'rs:',label='true value')
+            plt.plot(np.arange(0,len(all_data_pred)),all_data_pred,'m<:',label='pred value')
             plt.legend()
             plt.show()
         result = pd.DataFrame({"true":all_data_true,"pred":all_data_pred})
@@ -520,22 +510,5 @@ def predict(model, dataset):
     return predictions, losses
 if __name__=='__main__':
     trans_data_loader,vaildation_data_loader,test_data_loader=main()
-    # print(len(trans_data_loader))
     train(trans_data_loader)
-    # _, losses = predict(_model, trans_data_loader_noalarm)
-    # _, losses = predict(_model, trans_data_loader_alarm)
-    # _, losses = predict(_model, vaildation_data_loader_noalarm)
-    # _, losses = predict(_model, trans_data_loader)
-    # _, losses = predict(_model, trans_data_loader)
-    # _alarm, losses_alarm = predict(_model, test_data_loader_alarm)
     
-    # threshold = 5
-    # correct = sum(l <= threshold for l in losses)
-    # print(f'Correct noalarm predictions: {correct}/{len(losses)}')
-    # correct_alarm = sum(l >= threshold for l in losses_alarm)
-    # print(f'Correct alarm predictions: {correct_alarm}/{len(losses_alarm)}')
-    # sns.displot(torch.tensor(losses), bins=50, kde=True)
-    # plt.show()
-    # sns.displot(torch.tensor(losses_alarm), bins=50, kde=True)
-    # plt.show()
-    # plt.legend()
