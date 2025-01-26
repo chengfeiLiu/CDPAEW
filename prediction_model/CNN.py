@@ -88,8 +88,8 @@ class transformers(nn.Module):#442
     def __init__(self,in_feature,out_feature):
         super(transformers,self).__init__()
         self.linear1 = nn.Linear(1,d_model)
-        self.cnn =  nn.Sequential(nn.Conv1d(in_channels=11,out_channels=5,kernel_size=5,padding=0),nn.ReLU(),nn.MaxPool1d(kernel_size=5))
-        self.linear2 = nn.Linear(5,1)
+        self.cnn =  nn.Sequential(nn.Conv1d(in_channels=11,out_channels=128,kernel_size=5,padding=0),nn.ReLU(),nn.MaxPool1d(kernel_size=5))
+        self.linear2 = nn.Linear(128,75)
     def forward(self,data):
         cnndata=self.cnn(data)
         tgt = self.linear2(cnndata)
