@@ -91,7 +91,7 @@ class transformers(nn.Module):
         super(transformers,self).__init__()
         self.linear1 = nn.Linear(1,d_model)
         self.tcn =  TemporalConvNet(num_channels=[128,16,4,5],num_inputs=11,kernel_size=3)
-        self.linear2 = nn.Linear(128,1)
+        self.linear2 = nn.Linear(128,75)
     def forward(self,data):
         tcndata=self.tcn(data)
         tgt = self.linear2(tcndata)
