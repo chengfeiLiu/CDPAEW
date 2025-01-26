@@ -61,8 +61,8 @@ class handler_data(Dataset):
     def __len__(self):
         return len(self.all_fenchen_list)
 batch_size = 16
-d_model=64
-seq_len =32 
+d_model=512
+seq_len =256
 nhead=4
 d_k=d_v=d_q=32
 n_layers=4*d_model
@@ -89,7 +89,7 @@ class transformers(nn.Module):
         super(transformers,self).__init__()
         self.linear1 = nn.Linear(1,d_model)
         self.rnn = nn.RNN(input_size=11, hidden_size=seq_len,num_layers=2,batch_first=True,bidirectional=False)
-        self.linear2 = nn.Linear(d_model,5)
+        self.linear2 = nn.Linear(d_model,75)
     def forward(self,data):
         _da,rnndata=self.rnn(data.transpose(1,2))
         rnndata = rnndata.transpose(0,1).reshape(rnndata.shape[1],rnndata.shape[0]*rnndata.shape[2])
