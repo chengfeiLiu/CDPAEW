@@ -62,8 +62,8 @@ class handler_data(Dataset):
     def __len__(self):
         return len(self.all_fenchen_list)
 batch_size = 16
-d_model=64
-seq_len =38
+d_model=512
+seq_len =256
 nhead=4
 d_k=d_v=d_q=32
 n_layers=4*d_model
@@ -90,8 +90,8 @@ class transformers(nn.Module):
         super(transformers,self).__init__()
         self.linear1 = nn.Linear(1,d_model)
         self.LSTNet = Model(cuda=True,window=seq_len,hidRNN=seq_len*2,hidCNN=seq_len*2,hidSkip=5,
-                          CNN_kernel=3,skip=7,highway_window=3,dropout=0.2,output_fun="sigmoid",m=11 )
-        self.linear2 = nn.Linear(11,5)
+                          CNN_kernel=3,skip=7,highway_window=3,dropout=0.2,output_fun="sigmoid",m=128 )
+        self.linear2 = nn.Linear(128,75)
     def forward(self,data):
         lstnet_data=self.LSTNet(data.transpose(1,2))
         tgt = self.linear2(lstnet_data)
