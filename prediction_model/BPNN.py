@@ -61,7 +61,7 @@ class handler_data(Dataset):
     def __len__(self):
         return len(self.all_fenchen_list)
 batch_size = 16
-d_model=256
+d_model=512
 seq_len =256
 nhead=4
 d_k=d_v=d_q=32
