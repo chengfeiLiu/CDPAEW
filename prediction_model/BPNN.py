@@ -88,9 +88,9 @@ class transformers(nn.Module):
     def __init__(self,in_feature,out_feature):
         super(transformers,self).__init__()
         self.linear1 = nn.Linear(256,512)
-        self.linear2 = nn.Linear(512,5)
+        self.linear2 = nn.Linear(512,256)
         # self.linear3 = nn.Linear(256,128)
-        self.linear4 = nn.Linear(11,1)
+        self.linear4 = nn.Linear(256,75)
     def forward(self,data):
         bpnn_data =self.linear4(self.linear2(self.linear1(data)).transpose(1,2))
         return bpnn_data
