@@ -29,7 +29,7 @@ class handler_data(Dataset):
         return len(self.data)
 batch_size = 16
 d_model=512
-seq_len =40 
+seq_len =128
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, dropout=0.1, max_len=5000):
             super(PositionalEncoding, self).__init__()
