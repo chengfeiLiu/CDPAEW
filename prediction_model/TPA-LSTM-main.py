@@ -62,8 +62,8 @@ class handler_data(Dataset):
     def __len__(self):
         return len(self.all_fenchen_list)
 batch_size = 16
-d_model=64
-seq_len =32 
+d_model=512
+seq_len =256
 nhead=4
 d_k=d_v=d_q=32
 n_layers=4*d_model
@@ -89,8 +89,8 @@ class transformers(nn.Module):
     def __init__(self,in_feature,out_feature):
         super(transformers,self).__init__()
         self.linear1 = nn.Linear(1,d_model)
-        self.tpalstm = TPALSTM(input_size=11, output_horizon=5, hidden_size=32, obs_len=seq_len, n_layers=1).to(device)
-        self.linear2 = nn.Linear(d_model,5)
+        self.tpalstm = TPALSTM(input_size=11, output_horizon=5, hidden_size=128, obs_len=seq_len, n_layers=1).to(device)
+        self.linear2 = nn.Linear(d_model,75)
     def forward(self,data):
         tpalstmdata=self.tpalstm(data.transpose(1,2)).to(device)
         tgt = tpalstmdata.unsqueeze(2)
